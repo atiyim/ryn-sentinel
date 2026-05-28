@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onClipboardCmd:   (cb) => ipcRenderer.on('clipboard-cmd',   (_e, cmd) => cb(cmd)),
   copyText: (text) => ipcRenderer.invoke('copy-text', text),
   openDiscord: (url) => ipcRenderer.invoke('open-discord', url),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
 });

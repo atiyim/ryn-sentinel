@@ -59,6 +59,10 @@ ipcMain.handle('open-discord', (event, channelUrl) => {
   }
 });
 
+ipcMain.handle('install-update', () => {
+  autoUpdater.quitAndInstall();
+});
+
 ipcMain.handle('reset-clipboard-watcher', () => {
   lastClip = '';
   return { success: true };
@@ -131,12 +135,39 @@ function createWindow() {
     setTimeout(() => { try { autoUpdater.checkForUpdatesAndNotify(); } catch(e) {} }, 3000);
   });
 
-  autoUpdater.on('update-available', () => {
-    mainWindow.webContents.executeJavaScript(`showToast('Yeni güncelleme bulundu! İndiriliyor...', '🔄');`).catch(()=>{});
+  autoUpdater.on('update-available', (info) => {
+    mainWindow.webContents.executeJavaScript(`
+      showToast('🔄 v${info.version} bulundu, indiriliyor...', '🔄');
+    `).catch(()=>{});
   });
 
-  autoUpdater.on('update-downloaded', () => {
-    mainWindow.webContents.executeJavaScript(`showToast('Güncelleme hazır! Uygulama kapanınca kurulacak.', '✅');`).catch(()=>{});
+  autoUpdater.on('download-progress', (progress) => {
+    const pct = Math.round(progress.percent);
+    mainWindow.webContents.executeJavaScript(`
+      (function(){
+        const el = document.getElementById('update-progress-toast');
+        if (el) { el.textContent = '⬇ İndiriliyor... %${pct}'; return; }
+        const t = document.createElement('div');
+        t.id = 'update-progress-toast';
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 18px;font-size:12px;color:var(--text2);z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';
+        t.textContent = '⬇ İndiriliyor... %${pct}';
+        document.body.appendChild(t);
+      })();
+    `).catch(()=>{});
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    mainWindow.webContents.executeJavaScript(`
+      (function(){
+        const prog = document.getElementById('update-progress-toast');
+        if (prog) prog.remove();
+
+        const el = document.createElement('div');
+        el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:12px 20px;font-size:12px;color:var(--text);z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);display:flex;align-items:center;gap:12px;';
+        el.innerHTML = '<span>✅ Güncelleme hazır!</span><button onclick="window.electronAPI && window.electronAPI.installUpdate()" style="background:var(--green);color:#000;border:none;border-radius:5px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;">Şimdi Kur</button><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:14px;">×</button>';
+        document.body.appendChild(el);
+      })();
+    `).catch(()=>{});
   });
 
   autoUpdater.on('error', (err) => { console.log('Güncelleme hatası:', err.message); });
