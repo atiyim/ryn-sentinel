@@ -155,9 +155,12 @@ function createWindow() {
         if (old) old.remove();
         const el = document.createElement('div');
         el.id = 'update-toast';
-        el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 20px;font-size:12px;color:var(--text2);z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.5);';
-        el.textContent = '⬇ Yeni sürüm indiriliyor, lütfen bekleyin...';
+        el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 20px;font-size:12px;color:var(--text2);z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;';
+        el.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">⟳</span> <span>Yeni sürüm indiriliyor, lütfen bekleyin...</span>';
         document.body.appendChild(el);
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(style);
       })();
     `).catch(()=>{});
   });
