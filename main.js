@@ -100,16 +100,24 @@ function startClipboardWatcher(win) {
 let mainWindow;
 
 function createWindow() {
+  /* Splash screen */
+  const splash = new BrowserWindow({
+    width: 480, height: 320,
+    frame: false, transparent: true,
+    alwaysOnTop: true, resizable: false, center: true,
+    webPreferences: { nodeIntegration: false, contextIsolation: true },
+  });
+  splash.loadFile('splash.html');
+
+  /* Ana pencere — gizli başlar */
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 900,
-    minHeight: 600,
+    width: 1200, height: 800,
+    minWidth: 900, minHeight: 600,
     title: 'Ryn Sentinel',
-    backgroundColor: '#000000',
+    backgroundColor: '#050203',
+    show: false,
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: false, contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
       partition: 'persist:ryn-sentinel',
       autoplayPolicy: 'no-user-gesture-required',
@@ -131,8 +139,13 @@ function createWindow() {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    startClipboardWatcher(mainWindow);
-    setTimeout(() => { try { autoUpdater.checkForUpdatesAndNotify(); } catch(e) {} }, 3000);
+    setTimeout(() => {
+      if (splash && !splash.isDestroyed()) splash.destroy();
+      mainWindow.show();
+      mainWindow.focus();
+      startClipboardWatcher(mainWindow);
+      setTimeout(() => { try { autoUpdater.checkForUpdatesAndNotify(); } catch(e) {} }, 3000);
+    }, 3000);
   });
 
   autoUpdater.on('update-available', (info) => {

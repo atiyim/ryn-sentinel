@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #050203;
+    width: 100vw; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    user-select: none;
+  }
+
+  /* Arka plan grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(120,10,5,.06) 40px, rgba(120,10,5,.06) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(120,10,5,.06) 40px, rgba(120,10,5,.06) 41px);
+    z-index: 0;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 32px;
+    opacity: 0;
+    animation: fadeIn .6s ease .2s forwards;
+  }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* Köşe dekor */
+  .corner { position: fixed; width: 60px; height: 60px; }
+  .corner.tl { top: 20px; left: 20px; border-top: 1px solid rgba(200,160,40,.4); border-left: 1px solid rgba(200,160,40,.4); }
+  .corner.tr { top: 20px; right: 20px; border-top: 1px solid rgba(200,160,40,.4); border-right: 1px solid rgba(200,160,40,.4); }
+  .corner.bl { bottom: 20px; left: 20px; border-bottom: 1px solid rgba(200,160,40,.4); border-left: 1px solid rgba(200,160,40,.4); }
+  .corner.br { bottom: 20px; right: 20px; border-bottom: 1px solid rgba(200,160,40,.4); border-right: 1px solid rgba(200,160,40,.4); }
+
+  /* Göz ikonu */
+  .eye-wrap {
+    position: relative;
+    width: 90px; height: 90px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .eye-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(200,160,40,.3);
+    animation: ringPulse 2s ease infinite;
+  }
+  .eye-ring:nth-child(2) { inset: -10px; animation-delay: .4s; border-color: rgba(140,10,5,.3); }
+  .eye-ring:nth-child(3) { inset: -20px; animation-delay: .8s; }
+
+  @keyframes ringPulse {
+    0%, 100% { opacity: .3; transform: scale(1); }
+    50% { opacity: .7; transform: scale(1.05); }
+  }
+
+  .eye-svg { width: 70px; height: 70px; position: relative; z-index: 1; }
+
+  /* Başlık */
+  .title-wrap { text-align: center; }
+
+  .title {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #8b1a08 0%, #c8a020 30%, #f0d060 50%, #c8a020 70%, #8b1a08 100%);
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s ease infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0%; }
+    50% { background-position: 100%; }
+    100% { background-position: 0%; }
+  }
+
+  .subtitle {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(200,160,40,.5);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* Dekoratif çizgi */
+  .deco-line {
+    display: flex; align-items: center; gap: 12px;
+    width: 280px;
+  }
+  .deco-line::before, .deco-line::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,160,40,.4), transparent);
+  }
+  .deco-diamond {
+    width: 6px; height: 6px;
+    background: rgba(200,160,40,.6);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 240px;
+    display: flex; flex-direction: column; gap: 8px;
+    align-items: center;
+  }
+
+  .progress-track {
+    width: 100%; height: 2px;
+    background: rgba(255,255,255,.05);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b1a08, #c8a020, #f0d060);
+    border-radius: 2px;
+    width: 0%;
+    animation: progressFill 2.2s cubic-bezier(.4,0,.2,1) .5s forwards;
+  }
+
+  @keyframes progressFill { to { width: 100%; } }
+
+  .progress-text {
+    font-size: 9px;
+    color: rgba(200,160,40,.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: blink 1s ease infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  /* Fade out */
+  body.fade-out {
+    animation: fadeOut .5s ease forwards;
+  }
+  @keyframes fadeOut { to { opacity: 0; } }
+</style>
+</head>
+<body>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div class="container">
+    <!-- Göz SVG -->
+    <div class="eye-wrap">
+      <div class="eye-ring"></div>
+      <div class="eye-ring"></div>
+      <div class="eye-ring"></div>
+      <svg class="eye-svg" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+        <rect width="680" height="680" rx="100" fill="#0d0a1a"/>
+        <path d="M75 230 L300 270" stroke="#cc1122" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <path d="M80 340 Q190 270 300 340 Q190 400 80 340 Z" fill="#f0e8e8"/>
+        <path d="M80 340 Q190 270 300 340 L300 320 Q190 255 80 320 Z" fill="#0d0a1a"/>
+        <ellipse cx="190" cy="348" rx="50" ry="45" fill="#8b0000"/>
+        <ellipse cx="190" cy="348" rx="38" ry="36" fill="#cc0000"/>
+        <ellipse cx="190" cy="348" rx="26" ry="28" fill="#050208"/>
+        <ellipse cx="174" cy="332" rx="9" ry="7" fill="#ffffff" opacity="0.85"/>
+        <path d="M80 320 Q190 255 300 320" stroke="#cc1122" stroke-width="3" fill="none"/>
+        <path d="M605 230 L380 270" stroke="#cc1122" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <path d="M600 340 Q490 270 380 340 Q490 400 600 340 Z" fill="#f0e8e8"/>
+        <path d="M600 340 Q490 270 380 340 L380 320 Q490 255 600 320 Z" fill="#0d0a1a"/>
+        <ellipse cx="490" cy="348" rx="50" ry="45" fill="#8b0000"/>
+        <ellipse cx="490" cy="348" rx="38" ry="36" fill="#cc0000"/>
+        <ellipse cx="490" cy="348" rx="26" ry="28" fill="#050208"/>
+        <ellipse cx="474" cy="332" rx="9" ry="7" fill="#ffffff" opacity="0.85"/>
+        <path d="M600 320 Q490 255 380 320" stroke="#cc1122" stroke-width="3" fill="none"/>
+        <path d="M50 170 L75 198 L55 218 L80 240" stroke="#ff2244" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M630 170 L605 198 L625 218 L600 240" stroke="#ff2244" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Başlık -->
+    <div class="title-wrap">
+      <div class="title">RYN SENTINEL</div>
+      <div class="subtitle">ZenitMC Moderasyon Sistemi</div>
+    </div>
+
+    <!-- Dekor çizgi -->
+    <div class="deco-line">
+      <div class="deco-diamond"></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-text">Yükleniyor</div>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      document.body.classList.add('fade-out');
+    }, 2600);
+  </script>
+</body>
+</html>
